@@ -11,14 +11,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-define([
-  'dat/color/toString',
-  'dat/utils/common'
-], function(toString, common) {
+var toString = require('./toString');
+var common = require('../utils/common');
 
-  var result, toReturn;
+var result, toReturn;
 
-  var interpret = function() {
+var interpret = function() {
 
     toReturn = false;
 
@@ -26,315 +24,312 @@ define([
 
     common.each(INTERPRETATIONS, function(family) {
 
-      if (family.litmus(original)) {
+		if (family.litmus(original)) {
 
-        common.each(family.conversions, function(conversion, conversionName) {
+			common.each(family.conversions, function(conversion, conversionName) {
 
-          result = conversion.read(original);
+				result = conversion.read(original);
 
-          if (toReturn === false && result !== false) {
-            toReturn = result;
-            result.conversionName = conversionName;
-            result.conversion = conversion;
-            return common.BREAK;
+				if (toReturn === false && result !== false) {
+					toReturn = result;
+					result.conversionName = conversionName;
+					result.conversion = conversion;
+					return common.BREAK;
 
-          }
+				}
 
-        });
+			});
 
-        return common.BREAK;
+			return common.BREAK;
 
-      }
+		}
 
     });
 
     return toReturn;
 
-  };
+};
 
-  var INTERPRETATIONS = [
+var INTERPRETATIONS = [
 
     // Strings
     {
 
-      litmus: common.isString,
+		litmus: common.isString,
 
-      conversions: {
+		conversions: {
 
-        THREE_CHAR_HEX: {
+			THREE_CHAR_HEX: {
 
-          read: function(original) {
+				read: function(original) {
 
-            var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
-            if (test === null) return false;
+					var test = original.match(/^#([A-F0-9])([A-F0-9])([A-F0-9])$/i);
+					if (test === null) return false;
 
-            return {
-              space: 'HEX',
-              hex: parseInt(
-                  '0x' +
-                      test[1].toString() + test[1].toString() +
-                      test[2].toString() + test[2].toString() +
-                      test[3].toString() + test[3].toString())
-            };
+					return {
+						space: 'HEX',
+						hex: parseInt(
+							'0x' +
+								test[1].toString() + test[1].toString() +
+								test[2].toString() + test[2].toString() +
+								test[3].toString() + test[3].toString(), 16)
+					};
 
-          },
+				},
 
-          write: toString
+				write: toString
 
-        },
+			},
 
-        SIX_CHAR_HEX: {
+			SIX_CHAR_HEX: {
 
-          read: function(original) {
+				read: function(original) {
 
-            var test = original.match(/^#([A-F0-9]{6})$/i);
-            if (test === null) return false;
+					var test = original.match(/^#([A-F0-9]{6})$/i);
+					if (test === null) return false;
 
-            return {
-              space: 'HEX',
-              hex: parseInt('0x' + test[1].toString())
-            };
+					return {
+						space: 'HEX',
+						hex: parseInt('0x' + test[1].toString(), 16)
+					};
 
-          },
+				},
 
-          write: toString
+				write: toString
 
-        },
+			},
 
-        CSS_RGB: {
+			CSS_RGB: {
 
-          read: function(original) {
+				read: function(original) {
 
-            var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
-            if (test === null) return false;
+					var test = original.match(/^rgb\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\)/);
+					if (test === null) return false;
 
-            return {
-              space: 'RGB',
-              r: parseFloat(test[1]),
-              g: parseFloat(test[2]),
-              b: parseFloat(test[3])
-            };
+					return {
+						space: 'RGB',
+						r: parseFloat(test[1]),
+						g: parseFloat(test[2]),
+						b: parseFloat(test[3])
+					};
 
-          },
+				},
 
-          write: toString
+				write: toString
 
-        },
+			},
 
-        CSS_RGBA: {
+			CSS_RGBA: {
 
-          read: function(original) {
+				read: function(original) {
 
-            var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
-            if (test === null) return false;
+					var test = original.match(/^rgba\(\s*(.+)\s*,\s*(.+)\s*,\s*(.+)\s*\,\s*(.+)\s*\)/);
+					if (test === null) return false;
 
-            return {
-              space: 'RGB',
-              r: parseFloat(test[1]),
-              g: parseFloat(test[2]),
-              b: parseFloat(test[3]),
-              a: parseFloat(test[4])
-            };
+					return {
+						space: 'RGB',
+						r: parseFloat(test[1]),
+						g: parseFloat(test[2]),
+						b: parseFloat(test[3]),
+						a: parseFloat(test[4])
+					};
 
-          },
+				},
 
-          write: toString
+				write: toString
 
-        }
+			}
 
-      }
+		}
 
     },
 
     // Numbers
     {
 
-      litmus: common.isNumber,
+		litmus: common.isNumber,
 
-      conversions: {
+		conversions: {
 
-        HEX: {
-          read: function(original) {
-            return {
-              space: 'HEX',
-              hex: original,
-              conversionName: 'HEX'
-            }
-          },
+			HEX: {
+				read: function(original) {
+					return {
+						space: 'HEX',
+						hex: original,
+						conversionName: 'HEX'
+					}
+				},
 
-          write: function(color) {
-            return color.hex;
-          }
-        }
+				write: function(color) {
+					return color.hex;
+				}
+			}
 
-      }
+		}
 
     },
 
     // Arrays
     {
 
-      litmus: common.isArray,
+		litmus: common.isArray,
 
-      conversions: {
+		conversions: {
 
-        RGB_ARRAY: {
-          read: function(original) {
-            if (original.length != 3) return false;
-            return {
-              space: 'RGB',
-              r: original[0],
-              g: original[1],
-              b: original[2]
-            };
-          },
+			RGB_ARRAY: {
+				read: function(original) {
+					if (original.length != 3) return false;
+					return {
+						space: 'RGB',
+						r: original[0],
+						g: original[1],
+						b: original[2]
+					};
+				},
 
-          write: function(color) {
-            return [color.r, color.g, color.b];
-          }
+				write: function(color) {
+					return [color.r, color.g, color.b];
+				}
 
-        },
+			},
 
-        RGBA_ARRAY: {
-          read: function(original) {
-            if (original.length != 4) return false;
-            return {
-              space: 'RGB',
-              r: original[0],
-              g: original[1],
-              b: original[2],
-              a: original[3]
-            };
-          },
+			RGBA_ARRAY: {
+				read: function(original) {
+					if (original.length != 4) return false;
+					return {
+						space: 'RGB',
+						r: original[0],
+						g: original[1],
+						b: original[2],
+						a: original[3]
+					};
+				},
 
-          write: function(color) {
-            return [color.r, color.g, color.b, color.a];
-          }
+				write: function(color) {
+					return [color.r, color.g, color.b, color.a];
+				}
 
-        }
+			}
 
-      }
+		}
 
     },
 
     // Objects
     {
 
-      litmus: common.isObject,
+		litmus: common.isObject,
 
-      conversions: {
+		conversions: {
 
-        RGBA_OBJ: {
-          read: function(original) {
-            if (common.isNumber(original.r) &&
-                common.isNumber(original.g) &&
-                common.isNumber(original.b) &&
-                common.isNumber(original.a)) {
-              return {
-                space: 'RGB',
-                r: original.r,
-                g: original.g,
-                b: original.b,
-                a: original.a
-              }
-            }
-            return false;
-          },
+			RGBA_OBJ: {
+				read: function(original) {
+					if (common.isNumber(original.r) &&
+						common.isNumber(original.g) &&
+						common.isNumber(original.b) &&
+						common.isNumber(original.a)) {
+						return {
+							space: 'RGB',
+							r: original.r,
+							g: original.g,
+							b: original.b,
+							a: original.a
+						}
+					}
+					return false;
+				},
 
-          write: function(color) {
-            return {
-              r: color.r,
-              g: color.g,
-              b: color.b,
-              a: color.a
-            }
-          }
-        },
+				write: function(color) {
+					return {
+						r: color.r,
+						g: color.g,
+						b: color.b,
+						a: color.a
+					}
+				}
+			},
 
-        RGB_OBJ: {
-          read: function(original) {
-            if (common.isNumber(original.r) &&
-                common.isNumber(original.g) &&
-                common.isNumber(original.b)) {
-              return {
-                space: 'RGB',
-                r: original.r,
-                g: original.g,
-                b: original.b
-              }
-            }
-            return false;
-          },
+			RGB_OBJ: {
+				read: function(original) {
+					if (common.isNumber(original.r) &&
+						common.isNumber(original.g) &&
+						common.isNumber(original.b)) {
+						return {
+							space: 'RGB',
+							r: original.r,
+							g: original.g,
+							b: original.b
+						}
+					}
+					return false;
+				},
 
-          write: function(color) {
-            return {
-              r: color.r,
-              g: color.g,
-              b: color.b
-            }
-          }
-        },
+				write: function(color) {
+					return {
+						r: color.r,
+						g: color.g,
+						b: color.b
+					}
+				}
+			},
 
-        HSVA_OBJ: {
-          read: function(original) {
-            if (common.isNumber(original.h) &&
-                common.isNumber(original.s) &&
-                common.isNumber(original.v) &&
-                common.isNumber(original.a)) {
-              return {
-                space: 'HSV',
-                h: original.h,
-                s: original.s,
-                v: original.v,
-                a: original.a
-              }
-            }
-            return false;
-          },
+			HSVA_OBJ: {
+				read: function(original) {
+					if (common.isNumber(original.h) &&
+						common.isNumber(original.s) &&
+						common.isNumber(original.v) &&
+						common.isNumber(original.a)) {
+						return {
+							space: 'HSV',
+							h: original.h,
+							s: original.s,
+							v: original.v,
+							a: original.a
+						}
+					}
+					return false;
+				},
 
-          write: function(color) {
-            return {
-              h: color.h,
-              s: color.s,
-              v: color.v,
-              a: color.a
-            }
-          }
-        },
+				write: function(color) {
+					return {
+						h: color.h,
+						s: color.s,
+						v: color.v,
+						a: color.a
+					}
+				}
+			},
 
-        HSV_OBJ: {
-          read: function(original) {
-            if (common.isNumber(original.h) &&
-                common.isNumber(original.s) &&
-                common.isNumber(original.v)) {
-              return {
-                space: 'HSV',
-                h: original.h,
-                s: original.s,
-                v: original.v
-              }
-            }
-            return false;
-          },
+			HSV_OBJ: {
+				read: function(original) {
+					if (common.isNumber(original.h) &&
+						common.isNumber(original.s) &&
+						common.isNumber(original.v)) {
+						return {
+							space: 'HSV',
+							h: original.h,
+							s: original.s,
+							v: original.v
+						}
+					}
+					return false;
+				},
 
-          write: function(color) {
-            return {
-              h: color.h,
-              s: color.s,
-              v: color.v
-            }
-          }
+				write: function(color) {
+					return {
+						h: color.h,
+						s: color.s,
+						v: color.v
+					}
+				}
 
-        }
+			}
 
-      }
+		}
 
     }
 
 
-  ];
+];
 
-  return interpret;
-
-
-});
+module.exports = interpret;

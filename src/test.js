@@ -1,0 +1,1 @@
+window.dat = require('./index');
