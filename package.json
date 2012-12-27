@@ -1,0 +1,13 @@
+{
+	"private": true,
+	"version": "0.0.0",
+	"main": "src/index.js",
+	"name": "dat",
+	"devDependencies": {
+		"grunt":"0.3.17",
+		"grunt-browserify":"https://github.com/rocketpack/grunt-browserify/archive/0.1.2.tar.gz"
+	},
+	"scripts": {
+		"test": "node_modules/.bin/grunt"
+	}
+}
