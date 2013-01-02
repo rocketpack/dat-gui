@@ -42,7 +42,7 @@
     "supernew"      : false,
     "undef"         : false,
 
-    "newcap"        : true,
+    "newcap"        : false,
     "noempty"       : true,
     "nonew"         : false,
     "nomen"         : false,
