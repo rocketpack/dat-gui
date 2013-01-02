@@ -12,9 +12,9 @@
  */
 
 var css = require('../utils/css');
-var controllerFactory = require('../controllers/factory');
 var Controller = require('../controllers/Controller');
 var BooleanController = require('../controllers/BooleanController');
+var StringController = require('../controllers/StringController');
 var FunctionController = require('../controllers/FunctionController');
 var NumberControllerBox = require('../controllers/NumberControllerBox');
 var NumberControllerSlider = require('../controllers/NumberControllerSlider');
@@ -26,6 +26,7 @@ var dom = require('../dom/dom');
 var common = require('../utils/common');
 var styleSheet = require('./style.css.js');
 var saveDialogueContents = require('./saveDialogue.html.js');
+var sniff = require('../controllers/sniff');
 
 css.inject(styleSheet);
 
@@ -76,9 +77,41 @@ var hideable_guis = [];
  * @param {dat.gui.GUI} [params.parent] The GUI I'm nested in.
  * @param {Boolean} [params.closed] If true, starts closed
  */
+
 var GUI = function(params) {
 
     var _this = this;
+
+	this._typeControllers = {
+		color: function(object, property) {
+			return new ColorController(object, property);
+		},
+		option: function(object, property, opts) {
+			return new OptionController(object, property, opts);
+		},
+		numberSlider: function(object, property, min, max, step) {
+			return new NumberControllerSlider(object,
+												property,
+											  min, max, step);
+		},
+		numberBox: function(object, property, min, max, step) {
+			return new NumberControllerBox(object,
+										   property, {
+											   min: min,
+											   max: max,
+											   step: step
+										   });
+		},
+		string: function(object, property) {
+			return new StringController(object, property);
+		},
+		'function': function(object, property) {
+			return new FunctionController(object, property, '');
+		},
+		'boolean': function(object, property) {
+			return new BooleanController(object, property);
+		}
+	};
 
     /**
      * Outermost DOM Element
@@ -481,6 +514,19 @@ common.extend(
 
     /** @lends dat.gui.GUI */
     {
+        /**
+         * @param controllerName
+         * @param factory
+         */
+		define: function(controllerName, controllerFactory) {
+			this._typeControllers[controllerName] = controllerFactory;
+		},
+
+		createController: function(controllerName, args) {
+			return this.getRoot()
+				._typeControllers[controllerName]
+				.apply(this, args);
+		},
 
         /**
          * @param object
@@ -514,7 +560,7 @@ common.extend(
 				object,
 				property,
 				{
-					color: true
+					controller: 'color'
 				}
 			);
 
@@ -786,16 +832,14 @@ function add(gui, object, property, params) {
 
     var controller;
 
-    if (params.color) {
-
-		controller = new ColorController(object, property);
-
-    } else {
-
-		var factoryArgs = [object,property].concat(params.factoryArgs);
-		controller = controllerFactory.apply(gui, factoryArgs);
-
-    }
+	if(params.controller) {
+		controller = gui.createController(params.controller,
+													[object,property].concat(params.factoryArgs));
+	} else {
+		var controllerName = sniff(object, property, params.factoryArgs);
+		controller = gui.createController(controllerName,
+										  [object, property].concat(params.factoryArgs));
+	}
 
     if (params.before instanceof Controller) {
 		params.before = params.before.__li;
