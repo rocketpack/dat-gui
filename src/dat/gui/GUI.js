@@ -20,6 +20,8 @@ var NumberControllerBox = require('../controllers/NumberControllerBox');
 var NumberControllerSlider = require('../controllers/NumberControllerSlider');
 var OptionController = require('../controllers/OptionController');
 var ColorController = require('../controllers/ColorController');
+var NullController = require('../controllers/NullController');
+var UndefinedController = require('../controllers/UndefinedController');
 var requestAnimationFrame = require('../utils/requestAnimationFrame');
 var CenteredDiv = require('../dom/CenteredDiv');
 var dom = require('../dom/dom');
@@ -110,6 +112,12 @@ var GUI = function(params) {
 		},
 		'boolean': function(object, property) {
 			return new BooleanController(object, property);
+		},
+		'null': function(object, property) {
+			return new NullController(object, property);
+		},
+		'undefined': function(object, property) {
+			return new UndefinedController(object, property);
 		}
 	};
 

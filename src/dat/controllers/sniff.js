@@ -3,6 +3,15 @@ var common = require('../utils/common');
 module.exports = function(object, property, args) {
     var initialValue = object[property];
 
+
+    if (common.isUndefined(initialValue)) {
+        return 'undefined';
+    }
+
+    if (common.isNull(initialValue)) {
+        return 'null';
+    }
+
     if (common.isArray(args[0]) || common.isObject(args[0])) {
         return 'option'
     }
