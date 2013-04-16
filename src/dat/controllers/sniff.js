@@ -3,6 +3,9 @@ var common = require('../utils/common');
 module.exports = function(object, property, args) {
     var initialValue = object[property];
 
+    if (args[0]) {
+        return args[0];
+    }
 
     if (common.isUndefined(initialValue)) {
         return 'undefined';
