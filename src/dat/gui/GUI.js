@@ -939,7 +939,7 @@ function augmentController(gui, li, controller) {
 		},
 
 		name: function(v) {
-			controller.__li.firstElementChild.firstElementChild.innerHTML = v;
+			controller.__li.firstChild.firstChild.innerHTML = v;
 			return controller;
 		},
 
@@ -972,7 +972,7 @@ function augmentController(gui, li, controller) {
 		});
 
 		dom.addClass(li, 'has-slider');
-		controller.domElement.insertBefore(box.domElement, controller.domElement.firstElementChild);
+		controller.domElement.insertBefore(box.domElement, controller.domElement.firstChild);
 
     }
     else if (controller instanceof NumberControllerBox) {
@@ -1264,7 +1264,7 @@ function addResizeHandle(gui) {
     dom.bind(gui.__resize_handle, 'mousedown', dragStart);
     dom.bind(gui.__closeButton, 'mousedown', dragStart);
 
-    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstElementChild);
+    gui.domElement.insertBefore(gui.__resize_handle, gui.domElement.firstChild);
 
     function dragStart(e) {
 
