@@ -22,6 +22,7 @@ var OptionController = require('../controllers/OptionController');
 var ColorController = require('../controllers/ColorController');
 var NullController = require('../controllers/NullController');
 var UndefinedController = require('../controllers/UndefinedController');
+
 var requestAnimationFrame = require('../utils/requestAnimationFrame');
 var CenteredDiv = require('../dom/CenteredDiv');
 var dom = require('../dom/dom');
@@ -526,8 +527,12 @@ common.extend(
          * @param controllerName
          * @param factory
          */
-		define: function(controllerName, controllerFactory) {
+		defineController: function(controllerName, controllerFactory) {
 			this._typeControllers[controllerName] = controllerFactory;
+		},
+
+		hasController: function(controllerName) {
+			return (this._typeControllers[controllerName] !== undefined);
 		},
 
 		createController: function(controllerName, args) {
@@ -835,7 +840,8 @@ common.extend(
 function add(gui, object, property, params) {
 
     if (object[property] === undefined) {
-		throw new Error("Object " + object + " has no property \"" + property + "\"");
+		//throw new Error("Object " + object + " has no property \"" + property + "\"");
+		object[property] = ''
     }
 
     var controller;
