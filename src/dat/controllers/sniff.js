@@ -4,7 +4,8 @@ module.exports = function(object, property, args) {
     var initialValue = object[property];
 
     if (args[0]) {
-        return args[0];
+        // if we're given a controller, return it
+         return args[0];
     }
 
     if (common.isUndefined(initialValue)) {
